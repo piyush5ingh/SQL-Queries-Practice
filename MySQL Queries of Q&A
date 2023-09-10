@@ -1,0 +1,237 @@
+
+-- this database name  lco_car_rentals /*
+-- Difficulty: Intense
+-- Instruction: Import the given lco_car_rentals.sql file in MySQL Database and then the following questions and answer with mySQL queries.
+- Columns Discriptions by these query
+
+desc lco_car_rentals.customer ;
+		-- or
+SELECT 
+    COLUMN_NAME
+FROM
+    INFORMATION_SCHEMA.COLUMNS
+WHERE
+    TABLE_NAME = 'customer'
+        AND TABLE_SCHEMA = 'lco_car_rentals';
+	-- or
+SHOW COLUMNS FROM lco_car_rentals.customer;
+-- Q1) Insert the details of new customer:-
+-- First name : Nancy
+-- Last Name: Perry
+-- Dob : 1988-05-16
+-- License Number: K59042656E
+-- Email : nancy@gmail.com
+-- Ans:
+
+INSERT INTO lco_car_rentals.customer (`first_name`, `last_name`, `dob`, `driver_license_number`, `email`)
+VALUES ("Nancy", "Perry", "1988-05-16", "K59042656E", "nancy@gmail.com");
+
+-- check 
+SELECT 
+    *
+FROM
+    lco_car_rentals.customer
+WHERE
+    customer.first_name = 'Nancy';
+
+-- Q2) The new customer (inserted above) wants to rent a car from 2020-08-25 to 2020-08-30. More details are as follows:
+
+-- Vehicle Type : Economy SUV
+-- Fuel Option : Market
+-- Pick Up location: 5150 W 55th St , Chicago, IL, zip- 60638
+-- Drop Location: 9217 Airport Blvd, Los Angeles, CA, zip - 90045
+-- Ans:
+use lco_car_rentals;
+INSERT INTO `rental`(`start_date`, `end_date`, `customer_id`, `vehicle_type_id`, `fuel_option_id`, `pickup_location_id`, `drop_off_location_id`)
+ VALUES ("2020-08-25", "2020-08-30",
+-- `customer_id` 
+ (SELECT customer.id FROM customer WHERE customer.driver_license_number="K59042656E"), 
+ -- `vehicle_type_id`
+ (SELECT vehicle_type.id FROM vehicle_type WHERE vehicle_type.name="Economy SUV"), 
+ -- `fuel_option_id`
+ (SELECT fuel_option.id FROM fuel_option WHERE fuel_option.name="Market"), 
+ -- `pickup_location_id`
+ (SELECT location.id FROM location WHERE location.zipcode=60638),
+ -- `drop_off_location_id`
+ (SELECT location.id FROM location WHERE location.zipcode=90045));
+
+
+-- Q1) Insert the details of new customer:-
+-- First name : Nancy
+-- Last Name: Perry
+-- Dob : 1988-05-16
+-- License Number: K59042656E
+-- Email : nancy@gmail.com
+-- Ans:
+
+INSERT INTO lco_car_rentals.customer (`first_name`, `last_name`, `dob`, `driver_license_number`, `email`)
+VALUES ("Piyush", "Singh", "1995-05-13", "BHART955E", "piyush@gmail.com");
+
+-- Q2) The new customer (inserted above) wants to rent a car from 2023-08-25 to 2023-08-30. More details are as follows:
+
+
+
+INSERT INTO rental (`start_date`, `end_date`, `customer_id`, `vehicle_type_id`, `fuel_option_id`, `pickup_location_id`, `drop_off_location_id`)
+VALUES (
+  '2023-08-25', '2023-08-30',
+  -- `customer_id` 
+ (SELECT customer.id FROM customer WHERE customer.driver_license_number="BHART955E"), 
+ -- `vehicle_type_id`
+ (SELECT vehicle_type.id FROM vehicle_type WHERE vehicle_type.name="Economy SUV"), 
+ -- `fuel_option_id`
+ (SELECT fuel_option.id FROM fuel_option WHERE fuel_option.name="Market"), 
+ -- `pickup_location_id`
+ (SELECT location.id FROM location WHERE location.zipcode=60638),
+ -- `drop_off_location_id`
+ (SELECT location.id FROM location WHERE location.zipcode=90045));
+
+-- The customer with the driving license W045654959 changed his/her drop off location to 1001 Henderson St,  Fort Worth, TX, zip - 76102 
+--  and wants to extend the rental upto 4 more days. Update the record.
+
+UPDATE rental
+        LEFT JOIN
+    customer ON customer.id = rental.customer_id 
+SET 
+    drop_off_location_id = (SELECT 
+            location.id
+        FROM
+            location
+        WHERE
+            zipcode = '76102 '),
+    end_date = (SELECT end_date + INTERVAL 4 DAY)
+WHERE
+    driver_license_number = 'W045654959';
+
+SELECT 
+    *
+FROM
+    rental
+        LEFT JOIN
+    customer ON customer.id = rental.customer_id
+        LEFT JOIN
+    location ON location.id = rental.drop_off_location_id
+WHERE
+    driver_license_number = 'W045654959';
+
+-- Q1) Fetch all rental details with their equipment type.
+
+SELECT 
+    CONCAT(customer.first_name,
+            ' ',
+            customer.last_name) AS Customer_name,
+    customer.driver_license_number,
+    rental.start_date,
+    rental.end_date,
+    vehicle_type.name VT,
+    fuel_option.name AS FO,
+    CONCAT(pickup_location.street_address,
+            ',',
+            pickup_location.city,
+            ',',
+            pickup_location.state,
+            ',',
+            drop_off_location.zipcode) AS pickup_location,
+    CONCAT(drop_off_location.street_address,
+            ',',
+            drop_off_location.city,
+            ',',
+            drop_off_location.state,
+            ',',
+            drop_off_location.zipcode) AS drop_off_location,
+    equipment_type.name AS equipment_type
+FROM
+    rental
+        LEFT JOIN
+    customer ON customer.id = rental.customer_id
+        RIGHT JOIN
+    vehicle_type ON vehicle_type.id = rental.vehicle_type_id
+        RIGHT JOIN
+    fuel_option ON fuel_option.id = rental.fuel_option_id
+        RIGHT JOIN
+    location pickup_location ON pickup_location.id = rental.pickup_location_id
+        RIGHT JOIN
+    location drop_off_location ON drop_off_location.id = rental.drop_off_location_id
+        RIGHT JOIN
+    rental_has_equipment_type AS r ON r.rental_id = rental.id
+        RIGHT JOIN
+    equipment_type ON equipment_type.id = r.equipment_type_id;
+    
+    
+    -- Fetch all details of vehicles.
+    
+SELECT 
+    vehicle.brand,
+    vehicle.model,
+    vehicle.model_year,
+    vehicle.mileage,
+    vehicle.color,
+    vehicle_type.name,
+    vehicle_type.rental_value,
+    CONCAT(location.street_address,
+            ',',
+            location.city,
+            ',',
+            location.state,
+            ',',
+            location.zipcode) AS location
+FROM
+    vehicle
+        INNER JOIN
+    vehicle_type ON vehicle_type.id = vehicle.vehicle_type_id
+        INNER JOIN
+    vehicle_has_equiment AS v ON v.vehicle_id = vehicle.id
+        INNER JOIN
+    location ON location.id = vehicle.current_location_id;
+    
+    -- Get driving license of the customer with most rental insurances.
+SELECT 
+    CONCAT(customer.first_name,
+            ' ',
+            customer.last_name) AS Customer_name,
+    customer.driver_license_number,
+    rental.start_date,
+    rental.end_date,
+    COUNT(r.rental_id) AS number_of_insurance,
+    rental_invoice.insurance_cost_total,
+    rental_invoice.net_amount_payable,
+    MAX(rental_invoice.insurance_cost_total) AS max_insurance_cost_total,
+    MAX(rental_invoice.net_amount_payable) AS max_net_amount_payable
+FROM
+    customer
+        INNER JOIN
+    rental ON rental.customer_id = customer.id
+        INNER JOIN
+    rental_has_insurance AS r ON r.rental_id = rental.id
+        INNER JOIN
+    insurance ON insurance.id = r.insurance_id
+        INNER JOIN
+    rental_invoice ON rental_invoice.rental_id = rental.id
+GROUP BY r.rental_id , customer.first_name , customer.last_name , customer.driver_license_number , rental.start_date , rental.end_date , rental_invoice.insurance_cost_total , rental_invoice.net_amount_payable;
+
+
+SELECT 
+    CONCAT(customer.first_name,
+            ' ',
+            customer.last_name) AS Customer_name,
+    customer.driver_license_number,
+    rental.start_date,
+    rental.end_date,
+    COUNT(r.rental_id) AS number_of_insurance,
+    MAX(rental_invoice.insurance_cost_total) AS max_insurance_cost_total,
+    MAX(rental_invoice.net_amount_payable) AS max_net_amount_payable
+FROM
+    customer
+        INNER JOIN
+    rental ON rental.customer_id = customer.id
+        INNER JOIN
+    rental_has_insurance AS r ON r.rental_id = rental.id
+        INNER JOIN
+    insurance ON insurance.id = r.insurance_id
+        INNER JOIN
+    rental_invoice ON rental_invoice.rental_id = rental.id
+GROUP BY Customer_name , customer.driver_license_number , rental.start_date , rental.end_date;
+
+
+   
+
+
