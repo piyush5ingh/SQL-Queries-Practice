@@ -1,9 +1,8 @@
-# SQL-Queries-Practice
-MySQL database querying skills through a variety of MySQL queries
+##  Project: Car Rentals with SQL
 
-**README:**
+**Overview:**
 
-Welcome to my MySQL Query Practice Repository. This project showcases a collection of SQL queries along with detailed instructions and explanations. Whether you're a beginner or an experienced data enthusiast, you'll find valuable examples and guidance to help you master database querying.
+Welcome to my MySQL Project. This project showcases a collection of SQL queries along with detailed instructions and explanations.
 
 ##  Getting Started
 
@@ -23,28 +22,11 @@ To run these queries and explore the instructions, follow these steps:
 ## Queries Included
 
 1. **Insert New Customer**
-   - Description: Insert details of a new customer.
-   - SQL File: [insert_customer.sql](/queries/insert_customer.sql)
-
 2. **Rent a Car**
-   - Description: Rent a car with specified details.
-   - SQL File: [rent_car.sql](/queries/rent_car.sql)
-
 3. **Update Drop-Off Location and Extend Rental**
-   - Description: Update drop-off location and extend rental duration.
-   - SQL File: [update_dropoff_extend_rental.sql](/queries/update_dropoff_extend_rental.sql)
-
 4. **Fetch Rental Details**
-   - Description: Fetch rental details including equipment type.
-   - SQL File: [fetch_rental_details.sql](/queries/fetch_rental_details.sql)
-
 5. **Fetch Vehicle Details**
-   - Description: Fetch details of available vehicles.
-   - SQL File: [fetch_vehicle_details.sql](/queries/fetch_vehicle_details.sql)
-
 6. **Customer with Most Rental Insurances**
-   - Description: Get the customer with the most rental insurances.
-   - SQL File: [customer_with_most_insurances.sql](/queries/customer_with_most_insurances.sql)
 
 ## Formulas
 
@@ -64,12 +46,3 @@ Here are some SQL formulas used in the queries:
   SELECT DATE_ADD(start_date, INTERVAL 4 DAY) AS extended_date FROM rental;
   ```
 
-## Contributors
-
-- [Your Name](https://github.com/Piyush5ingh) 
-
-- 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-```
